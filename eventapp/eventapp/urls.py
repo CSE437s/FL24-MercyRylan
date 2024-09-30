@@ -17,14 +17,11 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 
-from .views import RegisterView, LoginView
+from eventapp import views
 
 urlpatterns = [
-    path('api/register/', RegisterView.as_view(), name='register'),  # Endpoint for user registration
-    path('api/login/', LoginView.as_view(), name='login'),           # Endpoint for user login
+    path('api/register/', views.RegisterView.as_view(), name='register'),  # Endpoint for user registration
+    path('api/login/', views.LoginView.as_view(), name='login'),           # Endpoint for user login
+    path('api/home', views.home, name='home')
 ]
-"""
-urlpatterns = [
-    path('admin/', admin.site.urls),
-]
-"""
+

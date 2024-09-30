@@ -6,6 +6,16 @@ from rest_framework.authtoken.models import Token
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate
 from rest_framework.permissions import AllowAny
+from django.shortcuts import render
+from django.conf import settings
+from django.http import JsonResponse
+import requests
+import environ
+
+
+# Initialize environment variables
+env = environ.Env()
+environ.Env.read_env('.env')
 
 # Registration View
 class RegisterView(APIView):
@@ -44,3 +54,10 @@ class LoginView(APIView):
             return Response({'message': 'Login successful', 'token': token.key}, status=status.HTTP_200_OK)
         else:
             return Response({'error': 'Invalid credentials'}, status=status.HTTP_400_BAD_REQUEST)
+
+def home(request):
+    google_maps_api_key = env('GOOGLE_MAPS_API_KEY')
+    context = {        
+        'google_maps_api_key': google_maps_api_key
+    }
+    return render(request, 'eventapp/home.html', context)
