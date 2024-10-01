@@ -1,23 +1,17 @@
+{% load static %}
 <!DOCTYPE html>
 <html>
 <head>
     <title>Google Maps Example</title>
-    <style>
-        /* Always set the map height explicitly to define the size of the div
-        * element that contains the map. */
-        #map {
-            height: 100%;
-        }
-        /* Optional: Makes the sample page fill the window. */
-        html, body {
-            height: 100%;
-            margin: 0;
-            padding: 0;
-        }
-    </style>
+    <link rel="stylesheet" type="text/css" href="{% static 'eventapp/css/home.css' %}">
 </head>
 <body>
+    <h1>Map View Page</h1>
     <div id="map"></div>
+    <div id="sidebar">
+        <div class="closebtn" onclick="toggleSidebar()">&times;</div>
+        <div id="event-list"></div>
+    </div>
     <script src="https://maps.googleapis.com/maps/api/js?key={{ google_maps_api_key }}&libraries=places&callback=initMap" async defer></script>
     <script>
         var map;
@@ -44,6 +38,8 @@
                         infowindow = new google.maps.InfoWindow();
                         service = new google.maps.places.PlacesService(map);
                         service.nearbySearch(request, callback);
+
+                        fetchEvents(map);
                     },
                     function(error) {
                         // Handle error
@@ -75,6 +71,51 @@
                 infowindow.open(map, this);
             });
         }
+
+        function fetchEvents(map) {
+
+            if (events.length > 0) {
+                events.forEach(event => {
+                    const marker = new google.maps.Marker({
+                        position: { lat: event.latitude, lng: event.longitude },
+                        map: map,
+                        title: event.name
+                    });
+
+                    marker.addListener('click', () => {
+                        showEventDetails(event);
+                    });
+                })
+
+            // Populate the right-hand sidebar with events
+            const eventList = document.getElementById('event-list');
+            eventList.innerHTML = ''; // Clear previous list
+
+            events.forEach(event => {
+                const eventElem = document.createElement('div');
+                eventElem.classList.add('event');
+                eventElem.innerHTML = `
+                    <h3>${event.name}</h3>
+                    <p>Time: ${event.start}</p>
+                    <p>${event.description}</p>
+                `;
+                eventList.appendChild(eventElem);
+            });
+            }
+
+        }
+
+        function showEventDetails(event) {
+            // Logic for displaying event details in the right sidebar
+            toggleSidebar();
+        }
+
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            sidebar.classList.toggle('open');
+        }
+
+        document.addEventListener('DOMContentLoaded', initMap);
     </script>
 </body>
 </html>

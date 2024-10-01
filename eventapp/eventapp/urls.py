@@ -16,12 +16,12 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-
-from eventapp import views
+from . import views
 
 urlpatterns = [
     path('api/register/', views.RegisterView.as_view(), name='register'),  # Endpoint for user registration
     path('api/login/', views.LoginView.as_view(), name='login'),           # Endpoint for user login
-    path('api/home', views.home, name='home')
+    path('api/home', views.map_view, name='home'),
+    path('api/events', views.fetch_events, name='events')
 ]
 

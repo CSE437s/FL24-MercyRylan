@@ -1,0 +1,35 @@
+body, html {
+    height: 100%;
+    margin: 0;
+    font-family: Arial, Helvetica, sans-serif;
+}
+#map {
+    height: 100%;
+    width: 75%;
+    float: left;
+}
+#sidebar {
+    height: 100%;
+    width: 25%;
+    position: fixed;
+    top: 0;
+    right: -25%;
+    background-color: white;
+    overflow-x: hidden;
+    transition: 0.5s;
+    box-shadow: -2px 0 5px rgba(0,0,0,0.3);
+}
+#sidebar.open {
+    right: 0;
+}
+#sidebar .closebtn {
+    position: absolute;
+    top: 20px;
+    right: 25px;
+    font-size: 36px;
+    cursor: pointer;
+}
+.event {
+    padding: 15px;
+    border-bottom: 1px solid #ccc;
+}
