@@ -12,6 +12,7 @@ from django.http import JsonResponse
 import requests
 import environ
 import json
+from asgiref.sync import sync_to_async
 
 
 # Initialize environment variables
@@ -59,6 +60,9 @@ class LoginView(APIView):
         else:
             return Response({'error': 'Invalid credentials'}, status=status.HTTP_400_BAD_REQUEST)
 
+def launch_page(request):
+    return render(request, 'eventapp/index.html')
+
 def map_view(request):
     latitude = request.GET.get('latitude') or '37.7749'
     longitude = request.GET.get('longitude') or '-122.4194'
@@ -67,12 +71,27 @@ def map_view(request):
     if not latitude or not longitude:
         return JsonResponse({'error': 'Latitude and Longitude are required parameters.'}, status=status.HTTP_400_BAD_REQUEST)
 
-    events = fetch_events_from_ticketmaster(latitude, longitude, radius) 
+    ticketmaster_url = f'https://app.ticketmaster.com/discovery/v2/events.json'
+    params = {
+        'latlong': f'{latitude},{longitude}',
+        'radius': radius,
+        'unit': 'miles',
+        'apikey': ticketmaster_api_key,
+    }
+    response = requests.get(ticketmaster_url, params=params)
+    if response.status_code == status.HTTP_200_OK:
+        events = response.json().get('_embedded', {}).get('events', [])
+        events_simplified = [{
+            'name': event['name'],
+            'start': event['dates']['start']['localDate'],
+            'description': event['info'] if 'info' in event else 'No description available.',
+            'latitude': event['_embedded']['venues'][0]['location']['latitude'],
+            'longitude': event['_embedded']['venues'][0]['location']['longitude']
+        } for event in events]
 
     context = {        
         'google_maps_api_key': google_maps_api_key,
-        'events': events
-        
+        'events': events_simplified     
     }
     return render(request, 'eventapp/home.html', context)
 

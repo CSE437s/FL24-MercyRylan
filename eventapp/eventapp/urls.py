@@ -19,6 +19,7 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
+    path('api/', views.launch_page, name="launch"),
     path('api/register/', views.RegisterView.as_view(), name='register'),  # Endpoint for user registration
     path('api/login/', views.LoginView.as_view(), name='login'),           # Endpoint for user login
     path('api/home', views.map_view, name='home'),
